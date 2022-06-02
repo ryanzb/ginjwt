@@ -23,7 +23,7 @@ func main() {
 	}
 	log.Infof("config: %+v", cfg)
 
-	db, err := db.Init(cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName)
+	db, err := db.Init(cfg.DB.DSN)
 	if err != nil {
 		log.Panicf("init db failed: %v", err)
 	}
@@ -35,14 +35,14 @@ func main() {
 
 	r := route.New(
 		jwtService,
-		controller.NewAuthController(authService, jwtService, userService), 
+		controller.NewAuthController(authService, jwtService, userService),
 		controller.NewUserController(userService, jwtService),
 	)
 
 	app := gin.Default()
 	r.Register(app)
 
-	if err := app.Run(cfg.Address); err != nil {
-		log.Fatalf("run server at %s failed: %v", cfg.Address, err)
+	if err := app.Run(cfg.Server.Address); err != nil {
+		log.Fatalf("run server at %s failed: %v", cfg.Server.Address, err)
 	}
 }

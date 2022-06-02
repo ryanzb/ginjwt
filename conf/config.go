@@ -5,11 +5,16 @@ import (
 )
 
 type Config struct {
-	Address    string `yaml:"address"`
-	DBHost     string `yaml:"db_host"`
-	DBUser     string `yaml:"db_user"`
-	DBPassword string `yaml:"db_password"`
-	DBName     string `yaml:"db_name"`
+	Server Server `yaml:"server"`
+	DB     DB     `yaml:"db"`
+}
+
+type Server struct {
+	Address string `yaml:"address"`
+}
+
+type DB struct {
+	DSN string `yaml:"dsn"`
 }
 
 func Load(filename string) (*Config, error) {

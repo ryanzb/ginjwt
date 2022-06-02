@@ -1,5 +1,5 @@
-address: 0.0.0.0:8080
-db_host: 124.221.255.218
-db_user: root
-db_password: 111111
-db_name: test
+server:
+  address: 0.0.0.0:8080
+
+db:
+  dsn: root:111111@tcp(124.221.255.218:3306)/test?charset=utf8mb4&parseTime=true&loc=Local
