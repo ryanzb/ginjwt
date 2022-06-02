@@ -1,0 +1,5 @@
+address: 0.0.0.0:8080
+db_host: 124.221.255.218
+db_user: root
+db_password: 111111
+db_name: test
