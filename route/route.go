@@ -2,20 +2,25 @@ package route
 
 import (
 	"ginjwt/controller"
+	"ginjwt/middleware"
+	"ginjwt/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Route struct {
+	jwtService service.JWTService
 	authController controller.AuthController
 	userController controller.UserController
 }
 
 func New(
-	authController controller.AuthController, 
+	jwtService service.JWTService,
+	authController controller.AuthController,
 	userController controller.UserController,
 ) *Route {
 	return &Route{
+		jwtService: jwtService,
 		authController: authController,
 		userController: userController,
 	}
@@ -28,8 +33,9 @@ func (r *Route) Register(app *gin.Engine) {
 		authGroup.POST("/register", r.authController.Register)
 	}
 
+	userGroup := app.Group("/api/user", middleware.AuthorizeJWT(r.jwtService))
 	{
-		app.GET("/api/user", r.userController.Info)
-		app.PUT("/api/user", r.userController.Update)
+		userGroup.GET("", r.userController.Info)
+		userGroup.PUT("", r.userController.Update)
 	}
 }

@@ -1,14 +1,13 @@
 package controller
 
 import (
-	"fmt"
 	"ginjwt/dto"
 	"ginjwt/response"
 	"ginjwt/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 )
 
 type UserController interface {
@@ -32,26 +31,7 @@ func NewUserController(
 }
 
 func (c *userController) Info(ctx *gin.Context) {
-	header := ctx.GetHeader("Authorization")
-	if header == "" {
-		resp := response.BuildErrorResponse("no token")
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, resp)
-		return
-	}
-	token, err := c.jwtService.ValidateToken(header)
-	if err != nil {
-		resp := response.BuildErrorResponse("validate token failed: " + err.Error())
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, resp)
-		return
-	}
-	if token == nil {
-		resp := response.BuildErrorResponse("token invalid")
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, resp)
-		return
-	}
-
-	clams := token.Claims.(jwt.MapClaims)
-	userID := fmt.Sprintf("%v", clams["user_id"])
+	userID := ctx.GetString("user_id")
 	user, err := c.userSerice.FindUserByID(userID)
 	if err != nil {
 		resp := response.BuildErrorResponse(err.Error())
@@ -67,6 +47,13 @@ func (c *userController) Update(ctx *gin.Context) {
 	var req dto.UpdateUserRequest
 	if err := ctx.ShouldBind(&req); err != nil {
 		resp := response.BuildErrorResponse(err.Error())
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	userID := ctx.GetString("user_id")
+	if strconv.Itoa(int(req.ID)) != userID {
+		resp := response.BuildErrorResponse("user id wrong")
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}

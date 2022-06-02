@@ -34,6 +34,7 @@ func main() {
 	userService := service.NewUserService(userRepo)
 
 	r := route.New(
+		jwtService,
 		controller.NewAuthController(authService, jwtService, userService), 
 		controller.NewUserController(userService, jwtService),
 	)
