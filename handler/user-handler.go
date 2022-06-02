@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"ginjwt/dto"
@@ -10,27 +10,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserController interface {
+type UserHandler interface {
 	Info(ctx *gin.Context)
 	Update(ctx *gin.Context)
 }
 
-type userController struct {
+type userHandler struct {
 	userSerice service.UserService
 	jwtService service.JWTService
 }
 
-func NewUserController(
+func NewUserHandler(
 	userSerice service.UserService,
 	jwtService service.JWTService,
-) UserController {
-	return &userController{
+) UserHandler {
+	return &userHandler{
 		userSerice: userSerice,
 		jwtService: jwtService,
 	}
 }
 
-func (c *userController) Info(ctx *gin.Context) {
+func (c *userHandler) Info(ctx *gin.Context) {
 	userID := ctx.GetString("user_id")
 	user, err := c.userSerice.FindUserByID(userID)
 	if err != nil {
@@ -43,7 +43,7 @@ func (c *userController) Info(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-func (c *userController) Update(ctx *gin.Context) {
+func (c *userHandler) Update(ctx *gin.Context) {
 	var req dto.UpdateUserRequest
 	if err := ctx.ShouldBind(&req); err != nil {
 		resp := response.BuildErrorResponse(err.Error())

@@ -1,7 +1,7 @@
 package route
 
 import (
-	"ginjwt/controller"
+	"ginjwt/handler"
 	"ginjwt/middleware"
 	"ginjwt/service"
 
@@ -14,20 +14,20 @@ var ProviderSet = wire.NewSet(NewRoute)
 type Route struct {
 	App            *gin.Engine
 	jwtService     service.JWTService
-	authController controller.AuthController
-	userController controller.UserController
+	authHandler handler.AuthHandler
+	userHandler handler.UserHandler
 }
 
 func NewRoute(
 	jwtService service.JWTService,
-	authController controller.AuthController,
-	userController controller.UserController,
+	authHandler handler.AuthHandler,
+	userHandler handler.UserHandler,
 ) *Route {
 	r := &Route{
 		App:            gin.Default(),
 		jwtService:     jwtService,
-		authController: authController,
-		userController: userController,
+		authHandler: authHandler,
+		userHandler: userHandler,
 	}
 	r.Register()
 	return r
@@ -36,13 +36,13 @@ func NewRoute(
 func (r *Route) Register() {
 	authGroup := r.App.Group("/api/auth")
 	{
-		authGroup.POST("/login", r.authController.Login)
-		authGroup.POST("/register", r.authController.Register)
+		authGroup.POST("/login", r.authHandler.Login)
+		authGroup.POST("/register", r.authHandler.Register)
 	}
 
 	userGroup := r.App.Group("/api/user", middleware.AuthorizeJWT(r.jwtService))
 	{
-		userGroup.GET("", r.userController.Info)
-		userGroup.PUT("", r.userController.Update)
+		userGroup.GET("", r.userHandler.Info)
+		userGroup.PUT("", r.userHandler.Update)
 	}
 }

@@ -7,8 +7,8 @@ package main
 
 import (
 	"ginjwt/conf"
-	"ginjwt/controller"
 	"ginjwt/db"
+	"ginjwt/handler"
 	"ginjwt/repo"
 	"ginjwt/route"
 	"ginjwt/service"
@@ -22,8 +22,8 @@ func initApp(cfg *conf.DB) *route.Route {
 	userRepo := repo.NewUserRepo(gormDB)
 	authService := service.NewAuthService(userRepo)
 	userService := service.NewUserService(userRepo)
-	authController := controller.NewAuthController(authService, jwtService, userService)
-	userController := controller.NewUserController(userService, jwtService)
-	routeRoute := route.NewRoute(jwtService, authController, userController)
+	authHandler := handler.NewAuthHandler(authService, jwtService, userService)
+	userHandler := handler.NewUserHandler(userService, jwtService)
+	routeRoute := route.NewRoute(jwtService, authHandler, userHandler)
 	return routeRoute
 }

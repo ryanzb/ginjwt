@@ -6,7 +6,7 @@ package main
 
 import (
 	"ginjwt/conf"
-	"ginjwt/controller"
+	"ginjwt/handler"
 	"ginjwt/db"
 	"ginjwt/repo"
 	"ginjwt/route"
@@ -20,7 +20,7 @@ func initApp(cfg *conf.DB) *route.Route {
 		db.ProviderSet,
 		repo.ProviderSet,
 		service.ProviderSet,
-		controller.ProviderSet,
+		handler.ProviderSet,
 		route.ProviderSet,
 	))
 }

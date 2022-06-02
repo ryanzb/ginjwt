@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"errors"
@@ -11,30 +11,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AuthController interface {
+type AuthHandler interface {
 	Login(ctx *gin.Context)
 	Register(ctx *gin.Context)
 }
 
-type authController struct {
+type authHandler struct {
 	authService service.AuthService
 	jwtService  service.JWTService
 	userService service.UserService
 }
 
-func NewAuthController(
+func NewAuthHandler(
 	authService service.AuthService,
 	jwtService service.JWTService,
 	userService service.UserService,
-) AuthController {
-	return &authController{
+) AuthHandler {
+	return &authHandler{
 		authService: authService,
 		jwtService:  jwtService,
 		userService: userService,
 	}
 }
 
-func (c *authController) Login(ctx *gin.Context) {
+func (c *authHandler) Login(ctx *gin.Context) {
 	var req dto.LoginRequest
 	if err := ctx.ShouldBind(&req); err != nil {
 		resp := response.BuildErrorResponse("failed to login: " + err.Error())
@@ -71,7 +71,7 @@ func (c *authController) Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-func (c *authController) Register(ctx *gin.Context) {
+func (c *authHandler) Register(ctx *gin.Context) {
 	var req dto.RegisterRequest
 	if err := ctx.ShouldBind(&req); err != nil {
 		resp := response.BuildErrorResponse("failed to register: " + err.Error())
