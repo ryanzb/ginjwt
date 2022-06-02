@@ -6,34 +6,41 @@ import (
 	"ginjwt/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
 )
 
+var ProviderSet = wire.NewSet(NewRoute)
+
 type Route struct {
-	jwtService service.JWTService
+	App            *gin.Engine
+	jwtService     service.JWTService
 	authController controller.AuthController
 	userController controller.UserController
 }
 
-func New(
+func NewRoute(
 	jwtService service.JWTService,
 	authController controller.AuthController,
 	userController controller.UserController,
 ) *Route {
-	return &Route{
-		jwtService: jwtService,
+	r := &Route{
+		App:            gin.Default(),
+		jwtService:     jwtService,
 		authController: authController,
 		userController: userController,
 	}
+	r.Register()
+	return r
 }
 
-func (r *Route) Register(app *gin.Engine) {
-	authGroup := app.Group("/api/auth")
+func (r *Route) Register() {
+	authGroup := r.App.Group("/api/auth")
 	{
 		authGroup.POST("/login", r.authController.Login)
 		authGroup.POST("/register", r.authController.Register)
 	}
 
-	userGroup := app.Group("/api/user", middleware.AuthorizeJWT(r.jwtService))
+	userGroup := r.App.Group("/api/user", middleware.AuthorizeJWT(r.jwtService))
 	{
 		userGroup.GET("", r.userController.Info)
 		userGroup.PUT("", r.userController.Update)

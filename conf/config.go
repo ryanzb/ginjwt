@@ -1,6 +1,8 @@
 package conf
 
 import (
+	"log"
+
 	"github.com/ryanzb/yaml"
 )
 
@@ -17,8 +19,12 @@ type DB struct {
 	DSN string `yaml:"dsn"`
 }
 
-func Load(filename string) (*Config, error) {
+func Load(filename string) *Config {
 	var config Config
-	err := yaml.UnmarshalFile(filename, &config)
-	return &config, err
+	if err := yaml.UnmarshalFile(filename, &config); err != nil {
+		log.Fatalf("load config failed: %v", err)
+		return nil
+	}
+	log.Printf("loaded config: %+v", config)
+	return &config
 }
